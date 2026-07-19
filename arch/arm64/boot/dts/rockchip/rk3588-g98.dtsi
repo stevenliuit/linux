@@ -336,7 +336,6 @@
     phy-mode = "rgmii-id";
     phy-handle = <&yt_phy0>;
     assigned-clocks = <&cru CLK_GMAC0_PTP_REF>;
-    assigned-clock-parents = <&cru CLK_GMAC0_PTP_REF_MUX>;
     assigned-clock-rates = <125000000>;
 };
 
@@ -369,7 +368,6 @@
     phy-mode = "rgmii-id";
     phy-handle = <&yt_phy1>;
     assigned-clocks = <&cru CLK_GMAC1_PTP_REF>;
-    assigned-clock-parents = <&cru CLK_GMAC1_PTP_REF_MUX>;
     assigned-clock-rates = <125000000>;
 };
 
