@@ -28,7 +28,7 @@
 #include "dt-bindings/pinctrl/rockchip.h"
 #include "dt-bindings/soc/rockchip,boot-mode.h"
 #include <dt-bindings/leds/common.h>
-#include <dt-bindings/input/event-codes.h>
+#include <dt-bindings/input/linux-event-codes.h>
 
 / {
     /* ---- board-wide fixed regulators (always-on) ---- */
