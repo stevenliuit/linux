@@ -401,7 +401,7 @@
     status = "okay";
     bus-width = <4>;
     cap-sd-highspeed;
-    cd-gpios = <&RK_PC5 GPIO_ACTIVE_LOW>;
+    cd-gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_LOW>;
     disable-wp;
     pinctrl-0 = <&sdmmc_bus4>, <&sdmmc_clk>, <&sdmmc_cmd>, <&sdmmc_det>;
     pinctrl-names = "default";
