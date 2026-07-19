@@ -1,0 +1,184 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2026 stevenliuit
+ *
+ * Rockchip RK3588 G98 NVR Board — top-level DTS (boot from SPI-NOR).
+ *
+ * Usage in armbian fork:
+ *   fdtfile=rockchip/rk3588s-g98.dtb
+ *
+ * Boots via SPI-NOR partitions:
+ *   loader  (1 MiB)   - SPL
+ *   uboot   (2 MiB)   - idbloader.img + u-boot.itb
+ *   boot    (27.6 MiB)- Image + rk3588s-g98.dtb + ramdisk
+ */
+
+/dts-v1/;
+#include "rk3588s.dtsi"
+#include "rk3588-g98-common.dtsi"
+#include "rk3588-g98.dtsi"
+
+/ {
+    model = "Rockchip RK3588 G98 NVR Board (LP4 SPI NOR)";
+    compatible = "rockchip,rk3588-g98", "rockchip,rk3588";
+
+    aliases {
+        ethernet0 = &gmac0;       /* eth0 in userspace; LAN1..LAN4 underneath */
+        ethernet1 = &gmac1;       /* eth1 in userspace; LAN5..LAN8 underneath */
+        mmc0 = &sdhci;            /* eMMC */
+        mmc1 = &sdmmc;            /* SD card */
+        serial2 = &uart2;         /* console UART */
+        spi5 = &sfc;              /* SPI-NOR */
+    };
+
+    chosen {
+        stdout-path = "serial2:1500000n8";
+        bootargs = "earlycon=uart8250,mmio32,0xfeb50000 console=ttyFIQ0 rootwait";
+    };
+
+    /* --- YT9215S #0: 5-port GbE switch on GMAC0 ---
+     * Port layout (port@0..port@3 are user-facing LAN1..LAN4):
+     *   port@0..port@3 → external GbE PHY (LAN1..LAN4)
+     *   port@4        → SGMII uplink to GMAC0
+     */
+    ytgsw0: ytgsw@0 {
+        compatible = "motorcomm,yt9215";
+        status = "okay";
+        reg = <0x0>;
+        motorcomm,id = <0x4F>;
+        motorcomm,mdio = <&mdio0>;
+        motorcomm,internal_phy;
+
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            port@0 {
+                reg = <0>;
+                label = "lan1";
+                phy-handle = <&ytgsw0_phy0>;
+                phy-mode = "internal";
+            };
+
+            port@1 {
+                reg = <1>;
+                label = "lan2";
+                phy-handle = <&ytgsw0_phy1>;
+                phy-mode = "internal";
+            };
+
+            port@2 {
+                reg = <2>;
+                label = "lan3";
+                phy-handle = <&ytgsw0_phy2>;
+                phy-mode = "internal";
+            };
+
+            port@3 {
+                reg = <3>;
+                label = "lan4";
+                phy-handle = <&ytgsw0_phy3>;
+                phy-mode = "internal";
+            };
+
+            port@4 {
+                reg = <4>;
+                label = "cpu";
+                ethernet = <&gmac0>;
+                phy-mode = "sgmii";
+            };
+        };
+
+        mdio {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            compatible = "motorcomm,yt9215-mdio";
+
+            ytgsw0_phy0: phy@0 {
+                reg = <0>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw0_phy1: phy@1 {
+                reg = <1>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw0_phy2: phy@2 {
+                reg = <2>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw0_phy3: phy@3 {
+                reg = <3>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+        };
+    };
+
+    /* --- YT9215S #1: 5-port GbE switch on GMAC1 --- */
+    ytgsw1: ytgsw@1 {
+        compatible = "motorcomm,yt9215";
+        status = "okay";
+        reg = <0x1>;
+        motorcomm,id = <0x4F>;
+        motorcomm,mdio = <&mdio1>;
+        motorcomm,internal_phy;
+
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            port@0 {
+                reg = <0>;
+                label = "lan5";
+                phy-handle = <&ytgsw1_phy0>;
+                phy-mode = "internal";
+            };
+            port@1 {
+                reg = <1>;
+                label = "lan6";
+                phy-handle = <&ytgsw1_phy1>;
+                phy-mode = "internal";
+            };
+            port@2 {
+                reg = <2>;
+                label = "lan7";
+                phy-handle = <&ytgsw1_phy2>;
+                phy-mode = "internal";
+            };
+            port@3 {
+                reg = <3>;
+                label = "lan8";
+                phy-handle = <&ytgsw1_phy3>;
+                phy-mode = "internal";
+            };
+            port@4 {
+                reg = <4>;
+                label = "cpu";
+                ethernet = <&gmac1>;
+                phy-mode = "sgmii";
+            };
+        };
+
+        mdio {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            compatible = "motorcomm,yt9215-mdio";
+
+            ytgsw1_phy0: phy@0 {
+                reg = <0>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw1_phy1: phy@1 {
+                reg = <1>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw1_phy2: phy@2 {
+                reg = <2>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+            ytgsw1_phy3: phy@3 {
+                reg = <3>;
+                compatible = "ethernet-phy-ieee802.3-c22";
+            };
+        };
+    };
+};

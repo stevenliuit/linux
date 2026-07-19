@@ -1,0 +1,160 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2026 stevenliuit
+ *
+ * Rockchip RK3588 G98 NVR Board — common DTS include.
+ *
+ * Board identification:
+ *   model     : "Rockchip RK3588 G98 NVR Board (LP4 SPI NOR)"
+ *   compatible: "rockchip,rk3588-g98", "rockchip,rk3588"
+ *
+ * Hardware topology (verified against live probe @192.168.168.1:2222):
+ *   - SoC    : Rockchip RK3588S (4× Cortex-A76 + 4× Cortex-A55, Mali-G610, NPU)
+ *   - DRAM   : 4/8/16 GiB LPDDR4/LPDDR5
+ *   - Storage: SPI-NOR 32 MiB (MX25L25673G); eMMC; SD card
+ *   - GMAC0  : 0xfe1c0000 (alias ethernet0), RGMII_ID, on-SoC PHY none
+ *              → YT9215S #0 SGMII → LAN ports 1..4
+ *   - GMAC1  : 0xfe1b0000 (alias ethernet1), RGMII_ID
+ *              → YT9215S #1 SGMII → LAN ports 5..8
+ *   - PCIe 2L : 0x0002:20 + 0x0002:21 = 2× RTL8125 2.5 GbE (eth0/eth1 userspace)
+ *   - PCIe 3L : 0x0003:30 + 0x0003:31 = unused (reserved)
+ *   - Console : UART2 @0xfeb5000  (earlycon=uart8250,mmio32,0xfeb50000)
+ *
+ * This dtsi is shared between rk3588-g98-spi-nor.dts (boot from SPI-NOR)
+ * and rk3588-g98-emmc.dts (boot from eMMC); only the wrapper differs.
+ */
+
+/dts-v1/;
+#include "dt-bindings/gpio/gpio.h"
+#include "dt-bindings/pinctrl/rockchip.h"
+#include "dt-bindings/soc/rockchip,boot-mode.h"
+
+/ {
+    /* ---- board-wide fixed regulators (always-on) ---- */
+    vcc12v_dcin: regulator-vcc12v-dcin {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc12v_dcin";
+        regulator-min-microvolt = <12000000>;
+        regulator-max-microvolt = <12000000>;
+        regulator-always-on;
+        regulator-boot-on;
+        vin-supply = <&vcc5v0_sys>;
+    };
+
+    vcc5v0_sys: regulator-vcc5v0-sys {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc5v0_sys";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        regulator-always-on;
+        regulator-boot-on;
+        /* GPIO-controlled enable later if wired; placeholder */
+    };
+
+    vcc3v3_pcie30: regulator-vcc3v3-pcie30 {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc3v3_pcie30";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        enable-active-high;
+        regulator-always-on;
+        regulator-boot-on;
+        gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+    };
+
+    vcc5v0_host: regulator-vcc5v0-host {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc5v0_host";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        enable-active-high;
+        regulator-always-on;
+        regulator-boot-on;
+        gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_HIGH>;
+    };
+
+    vcc_1v1_nldo_s3: regulator-vcc-1v1-nldo-s3 {
+        compatible = "regulator-fixed";
+        regulator-name = "vcc_1v1_nldo_s3";
+        regulator-min-microvolt = <1100000>;
+        regulator-max-microvolt = <1100000>;
+        regulator-always-on;
+        regulator-boot-on;
+    };
+
+    /* ---- board LEDs (GPIO) ---- */
+    leds {
+        compatible = "gpio-leds";
+
+        hdd-led {
+            label = "g98:hdd:activity";
+            gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
+            color = <LED_COLOR_ID_WHITE>;
+            default-state = "off";
+            linux,default-trigger = "disk-activity";
+        };
+
+        net-led {
+            label = "g98:net:status";
+            gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_LOW>;
+            color = <LED_COLOR_ID_GREEN>;
+            default-state = "on";
+            linux,default-trigger = "heartbeat";
+        };
+
+        work-led {
+            label = "g98:work:status";
+            gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_HIGH>;
+            color = <LED_COLOR_ID_BLUE>;
+            default-state = "off";
+            linux,default-trigger = "none";
+        };
+    };
+
+    /* ---- ADC keys (vol-up button on SARADC ch1) ---- */
+    adc-keys {
+        compatible = "adc-keys";
+        io-channels = <&saradc 1>;
+        io-channel-names = "buttons";
+        keyup-threshold-microvolt = <1800000>;
+        poll-interval = <100>;
+
+        vol-up-key {
+            label = "Volume Up";
+            linux,code = <KEY_VOLUMEUP>;
+            press-threshold-microvolt = <100000>;
+        };
+    };
+
+    /* ---- FIQ debugger on UART2 (console in early boot) ---- */
+    fiq-debugger {
+        compatible = "rockchip,fiq-debugger";
+        rockchip,serial-id = <2>;
+        rockchip,wake-irq = <0>;
+        /* IRQ filled in board file */
+        pinctrl-0 = <&uart2m0_xfer>;
+        pinctrl-names = "default";
+        status = "okay";
+    };
+
+    /* ----- PWM backlight ---- */
+    pwm_bl: pwm-backlight {
+        compatible = "pwm-backlight";
+        pwms = <&pwm3 0 25000 0>;
+        brightness-levels = <0 25 50 75 100>;
+        default-brightness-level = <2>;
+        enable-gpios = <&gpio4 RK_PC5 GPIO_ACTIVE_HIGH>;
+        status = "disabled"; /* not populated on G98 */
+    };
+};
+
+/* &uart2 consumed by fiq-debugger above (no separate node needed) */
+&uart2 {
+    status = "okay";
+    pinctrl-0 = <&uart2m0_xfer>;
+    pinctrl-names = "default";
+};
+
+&pwm3 {
+    status = "disabled";
+};
