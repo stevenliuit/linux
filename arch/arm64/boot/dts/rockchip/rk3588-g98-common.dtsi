@@ -24,7 +24,6 @@
  * and rk3588-g98-emmc.dts (boot from eMMC); only the wrapper differs.
  */
 
-/dts-v1/;
 #include "dt-bindings/gpio/gpio.h"
 #include "dt-bindings/pinctrl/rockchip.h"
 #include "dt-bindings/soc/rockchip,boot-mode.h"
