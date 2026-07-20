@@ -25,7 +25,6 @@
 /* ============= I2C bus controllers ============= */
 &i2c0 {
     status = "okay";
-    pinctrl-0 = <&i2c0m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 
@@ -34,30 +33,25 @@
 
 &i2c1 {
     status = "okay";
-    pinctrl-0 = <&i2c1m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 };
 
 &i2c2 {
     status = "okay";
-    pinctrl-0 = <&i2c2m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 };
 
 &i2c3 {
     status = "okay";
-    pinctrl-0 = <&i2c3m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 
     es8311: es8311@18 {
         compatible = "everest,es8311";
         reg = <0x18>;
-        clocks = <&i2s1_8ch_mclkout>;
         pinctrl-names = "default";
-        pinctrl-0 = <&i2s1m0_mclk>;
         #sound-dai-cells = <0>;
         status = "okay";
     };
@@ -65,14 +59,12 @@
 
 &i2c4 {
     status = "okay";
-    pinctrl-0 = <&i2c4m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 };
 
 &i2c6 {
     status = "okay";
-    pinctrl-0 = <&i2c6m0_xfer>;
     pinctrl-names = "default";
     clock-frequency = <400000>;
 
@@ -83,7 +75,6 @@
         clock-frequency = <32768>;
         clock-output-names = "hym8563";
         pinctrl-names = "default";
-        pinctrl-0 = <&rtc_int>;
         interrupt-parent = <&gpio0>;
         interrupts = <RK_PD3 IRQ_TYPE_LEVEL_LOW>;
         status = "okay";
@@ -93,7 +84,6 @@
 /* ============= SPI2 — used for RK806 PMIC over SPMI ============= */
 &spi2 {
     status = "okay";
-    pinctrl-0 = <&spi2m0_pins>;
     pinctrl-names = "default";
 
     rk806: pmic@0 {
@@ -325,18 +315,13 @@
 /* ============= GMAC0 (0xfe1c0000) → YT9215S #0 ============= */
 &gmac0 {
     status = "okay";
-    pinctrl-0 = <&gmac0_rgmii_miim
-             &gmac0_rgmii_tx_bus2
-             &gmac0_rgmii_rx_bus2
-             &gmac0_rgmii_clk>;
     pinctrl-names = "default";
     clock_in_out = "output";
     rx_delay = <0x30>;
     tx_delay = <0x10>;
     phy-mode = "rgmii-id";
     phy-handle = <&yt_phy0>;
-    assigned-clocks = <&clk_GMAC0_PTP_REF>;
-    assigned-clock-rates = <125000000>;
+    assigned-
 };
 
 &mdio0 {
@@ -357,18 +342,13 @@
 /* ============= GMAC1 (0xfe1b0000) → YT9215S #1 ============= */
 &gmac1 {
     status = "okay";
-    pinctrl-0 = <&gmac1_rgmii_miim
-             &gmac1_rgmii_tx_bus2
-             &gmac1_rgmii_rx_bus2
-             &gmac1_rgmii_clk>;
     pinctrl-names = "default";
     clock_in_out = "output";
     rx_delay = <0x30>;
     tx_delay = <0x10>;
     phy-mode = "rgmii-id";
     phy-handle = <&yt_phy1>;
-    assigned-clocks = <&clk_GMAC1_PTP_REF>;
-    assigned-clock-rates = <125000000>;
+    assigned-
 };
 
 &mdio1 {

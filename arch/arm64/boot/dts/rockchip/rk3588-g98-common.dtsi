@@ -133,7 +133,6 @@
         rockchip,serial-id = <2>;
         rockchip,wake-irq = <0>;
         /* IRQ filled in board file */
-        pinctrl-0 = <&uart2m0_xfer>;
         pinctrl-names = "default";
         status = "okay";
     };
@@ -152,7 +151,6 @@
 /* &uart2 consumed by fiq-debugger above (no separate node needed) */
 &uart2 {
     status = "okay";
-    pinctrl-0 = <&uart2m0_xfer>;
     pinctrl-names = "default";
 };
 
