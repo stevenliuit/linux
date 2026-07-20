@@ -15,7 +15,7 @@
 
 /dts-v1/;
 
-#include "rk3588.dtsi"
+#include "rk3588s.dtsi"
 #include "rk3588-g98-common.dtsi"
 #include "rk3588-g98.dtsi"
 
