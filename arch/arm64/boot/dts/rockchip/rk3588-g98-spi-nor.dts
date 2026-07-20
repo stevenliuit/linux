@@ -5,16 +5,17 @@
  * Rockchip RK3588 G98 NVR Board — top-level DTS (boot from SPI-NOR).
  *
  * Usage in armbian fork:
- *   fdtfile=rockchip/rk3588s-g98.dtb
+ *   fdtfile=rockchip/rk3588-g98.dtb
  *
  * Boots via SPI-NOR partitions:
  *   loader  (1 MiB)   - SPL
  *   uboot   (2 MiB)   - idbloader.img + u-boot.itb
- *   boot    (27.6 MiB)- Image + rk3588s-g98.dtb + ramdisk
+ *   boot    (27.6 MiB)- Image + rk3588-g98.dtb + ramdisk
  */
 
 /dts-v1/;
-#include "rk3588s.dtsi"
+
+#include "rk3588.dtsi"
 #include "rk3588-g98-common.dtsi"
 #include "rk3588-g98.dtsi"
 
